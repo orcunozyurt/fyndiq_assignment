@@ -1,7 +1,10 @@
 # fyndiq_assignment
 Smart Url Shortener Django framework app that shortens the url provided with usage of a word list so that urls do not contain meaningless hashes but a related word in them.
+
   [example url: http://techcrunch.com/2012/12/28/pinterest-lawsuit/]
+  
   [shortened url: http://mysite.com/lawsuit/]
+  
 # Setup
   If no virtual environment is set:
     pip install virtualenvwrapper
