@@ -1,0 +1,35 @@
+{% extends 'urlshortener/base.html' %}
+
+{% block title %}Shorten URLs.{% endblock %}
+
+{% block body_block %}
+<div class="jumbotron">
+    <center>
+        {% if state == "submitted" %}
+            {% if status %}
+            <div class="alert alert-success" role="alert">
+                <strong>The shortened URL created is <a href="http://{{ site_base_url }}/{{ alias }}">http://{{ site_base_url }}/{{ alias }}</a></strong>
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+                <strong>An Error Occurred!</strong>
+            </div>
+            {% endif %}
+        {% endif %}
+        {% block url_form %}
+        <form name="url_form" action="/submit/" method="get">
+          {{ link_form }}
+          <input  class="btn btn-lg btn-primary" type="submit" value="Shorten!" />
+        </form>
+        {% endblock %}
+        {% for message in messages %}
+            <div class="alert alert-danger" role="alert">
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    </center>
+</div>
+
+
+
+{% endblock %}

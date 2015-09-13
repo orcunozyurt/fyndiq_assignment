@@ -1,0 +1,4 @@
+;;extensions to ignore
+*.log
+*.pot
+*.pyc
