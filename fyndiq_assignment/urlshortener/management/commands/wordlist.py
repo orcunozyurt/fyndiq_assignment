@@ -4,7 +4,7 @@ from urlshortener.models import WordList
 
 class Command(BaseCommand):
     args = 'None'
-    help = 'It hopefully loads the word list given by Fyndiq to DB..'
+    help = 'It hopefully loads the word list given by Fyndiq to DB..:)))'
 
     def handle(self, *args, **options):
         print "we are starting.."

@@ -8,7 +8,12 @@ from django.http import HttpResponseRedirect
 
 # Create your views here.
 def bulk_data(request):
-    
+    """
+        Method was created to serve data from db as easy as possible
+        url_form : form to get url input
+        recent_urls : last 10 conversions to show on main page(not a part of assignment-optional)
+        state : state variable for cases of form submitted - on error etc.
+    """
     url_form = URLInputForm()
     bulk_data_dict = {}
     bulk_data_dict['url_form'] = url_form
@@ -18,6 +23,10 @@ def bulk_data(request):
     return bulk_data_dict
     
 def index(request):
+    """
+        View for index page..
+        Sending the bulk_data() to index.html 
+    """
     context = RequestContext(request)
     bulk = bulk_data(request)
 
@@ -25,18 +34,22 @@ def index(request):
     
 def key_generator(url):
     """
+        example url:http://techcrunch.com/2012/12/28/pinterest-lawsuit/ 
         Method is used for generating a key from the given url.
+        Going to split the url by "/" and extract components
+        Then split by "-" to get the keys to be used in shortened url
     """
     word_list_object = None
-    url_components = reversed(url.split('/')) #start splitting from end. 
+    url_components = reversed(url.split('/')) #start splitting from end.(url_components:pinterest-lawsuit) 
     
-    for component in url_components:
+    for component in url_components:  
         if word_list_object is not None:
             break
         
-        words = component.split('-')
+        words = component.split('-') #(words:[pinterest,lawsuit]) 
         for word in words:
-            print word
+            print word # Seeing the word on console calms me down but it is bad practice..
+            # Now it is time to try to get a matching alias from wordlist.
             try:
                 matching_obj = WordList.objects.get(word=word)
                 if hasattr(matching_obj, 'pairedurl'):
@@ -48,44 +61,45 @@ def key_generator(url):
             except WordList.DoesNotExist:
                 continue
             
-    if word_list_object is None:
-        free_words = WordList.objects.filter(is_used=False)
-        if(free_words.count() == 0):
+    if word_list_object is None:   # If Cant find any matching word for some reason..
+        free_words = WordList.objects.filter(is_used=False) # get the words that are still free..
+        if(free_words.count() == 0): # If no free words we should get the oldest pair and delete
             latest_pair = PairedUrl.objects.order_by('cdate')[:1].get()
             print str(latest_pair) + "will be removed.."
-            latest_pair.key_generated.is_used=False
+            latest_pair.key_generated.is_used=False #and free the word from the word list.
             latest_pair.delete()
             
-            free_words = WordList.objects.filter(is_used=False)
+            free_words = WordList.objects.filter(is_used=False)# search for free word again..
             
-        random = randint(0, len(free_words)-1)
+        random = randint(0, len(free_words)-1) # pick a random word from free words.
         word_list_object = free_words[random]
 
 
-    print "the alias is " + str(word_list_object.word)
+    print "the alias is " + str(word_list_object.word) # seeing the process on console..
         
     return word_list_object
     
     
 def submit(request):
     """
-    View for submitting the URLs.
+    View for submitting the URLs. It is both fine to POST or GET 
     :param request:
     :return:
     """
     context = RequestContext(request)
     url = None
     url_form = None
-   
+    
+    # Handle both POST and GET Requests.
     if request.method == 'GET':
         url_form = URLInputForm(request.GET)
     elif request.method == 'POST':
         url_form = URLInputForm(request.POST)
     
-    values = bulk_data(request)
-    values['state'] = "submitted"
-    if url_form and url_form.is_valid():
-        print url_form.cleaned_data
+    values = bulk_data(request) # bulk data method we created at the begining.
+    values['state'] = "submitted" # Form is submitted , so change the state.
+    if url_form and url_form.is_valid(): # URL validation..
+        
         url = url_form.cleaned_data['url_input']
         print "URL:"+url
         link = None
@@ -114,6 +128,10 @@ def submit(request):
     
     
 def redirect(request):
+    """
+     Match the alias and redirect to original URL.
+     
+    """
     alias = request.path
     alias = alias.replace('/', '')
     try:
