@@ -7,8 +7,11 @@ Smart Url Shortener Django framework app that shortens the url provided with usa
   
 # Setup
   If no virtual environment is set:
+  
     pip install virtualenvwrapper
+    
     mkvirtualenv django_project
+    
     workon django_project
 
   Download the repository and Install Django or  use requirements.txt( pip install -r requirements.txt )
